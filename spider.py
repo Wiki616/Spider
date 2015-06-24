@@ -4,14 +4,30 @@
 
 import urllib
 import urllib2
+import re
+from config import url , user_agent , values , url_root
 
-url = 'http://tieba.baidu.com/p/3847106695'
-user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.124 Safari/537.36'
-values = {'name' : 'Wiki',
-          'location' : 'fdu'}
+def getLinks(content):
+    p = re.compile(r'\/p\/\d+')
+    r = p.findall(content)
+    return r
+
+def getContent(url):
+    req = urllib2.Request(url,data,headers)
+    response = urllib2.urlopen(req)
+    content = response.read().decode('utf-8').encode('gbk')
+    print 'ok'
+
 headers = {'User-agent' : user_agent}
 data = urllib.urlencode(values)
 req = urllib2.Request(url,data,headers)
 response = urllib2.urlopen(req)
-content = response.read().decode('utf-8').encode('gbk')
-print content
+content = response.read()
+s = getLinks(content)
+dict = {}
+for suffix in s:
+    if (not dict.has_key(suffix)):
+        getContent(url_root + suffix)
+        dict[suffix] = True
+print dict
+#print content
